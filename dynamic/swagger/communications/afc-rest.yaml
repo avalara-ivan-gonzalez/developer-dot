@@ -807,7 +807,38 @@ paths:
             description: PCode for taxing jurisdiction.
             format: int32
             type: integer
-      deprecated: false
+      deprecated: false  
+  "/api/v1/CalculateTaxesMulti":
+    post:
+      tags:
+      - CalculateTaxesMulti
+      summary: DCalculates taxes on multiple transactions within a single request.
+      description: This method accepts multiple transactions and performs appropriate tax calculations.
+      operationId: ApiV1CalculateTaxesMultiPost
+      consumes:
+      - application/json
+      - text/json
+      - application/json-patch+json
+      produces:
+      - text/plain
+      - application/json
+      - text/json
+      parameters:
+      - name: request
+        in: body
+        description: List of transactions to process and default transaction values.
+        required: true
+        schema:
+          "$ref": "#/definitions/MultiRequestInput
+      responses:
+        '200':
+          description: OK
+          schema:
+			description: Tax calculation results for each transaction in the request input.
+            type: array
+            items:
+              "$ref": "#/definitions/MultiRequestResult"
+      deprecated: false	  
 definitions:
   BridgeConferenceTransaction:
     description: Bridge Conference Transaction
@@ -2123,6 +2154,297 @@ definitions:
         format: int32
         description: Jurisdiction PCode.
         type: integer
+  MultiRequestItem:
+    description: Transaction input data used for multi-transaction tax calculation APIs.
+    type: object
+    properties:
+      OriginationAddress:
+        "$ref": "#/definitions/ZipAddress"
+        description: Origination address.
+      OriginationFipsCode:
+        description: Origination FIPS code.
+        type: string
+      OriginationPCode:
+        format: int32
+        description: Origination PCode.
+        type: integer
+      OriginationNpaNxx:
+        format: int32
+        description: Origination NPANXX.
+        type: integer
+      TerminationAddress:
+        "$ref": "#/definitions/ZipAddress"
+        description: Termination address.
+      TerminationFipsCode:
+        description: Termination FIPS code.
+        type: string
+      TerminationPCode:
+        format: int32
+        description: Termination PCode.
+        type: integer
+      TerminationNpaNxx:
+        format: int32
+        description: Termination NPANXX.
+        type: integer
+      BillToAddress:
+        "$ref": "#/definitions/ZipAddress"
+        description: Bill-to address.
+      BillToFipsCode:
+        description: Bill-to FIPS code.
+        type: string
+      BillToPCode:
+        format: int32
+        description: Bill-to PCode.
+        type: integer
+      BillToNpaNxx:
+        format: int32
+        description: Bill-to NPANXX
+        type: integer
+      IsPrivateLine:
+        description: Indicates if the transaction is a private line transaction.
+        type: boolean
+      PrivateLineSplit:
+        format: double
+        description: "For private line transactions, this is the split between the
+          ending points of a private line. The value indicates how
+          much the portion of the charge belongs to the origin user."
+        type: number
+      CustomerType:
+        format: int32
+        description: Customer type. See the "TM_00116_AFC SaaS pro Telecom Developer
+          Manual.pdf" for a list of valid customer types.
+        type: integer
+      BusinessClass:
+        format: int32
+        description: Business class. See the "TM_00116_AFC SaaS pro Telecom Developer
+          Manual.pdf" for a list of valid business classes.
+        type: integer
+      Sale:
+        description: Indicates if this is a retail sale. Use false for resale/wholesale
+          transactions.
+        type: boolean
+      TransactionType:
+        format: int32
+        description: Transaction type.
+        type: integer
+      ServiceType:
+        format: int32
+        description: Service type.
+        type: integer
+      ServiceClass:
+        format: int32
+        description: Service class. See the "TM_00116_AFC SaaS pro Telecom Developer
+          Manual.pdf" for a list of valid Service Classes.
+        type: integer
+      Date:
+        format: date-time
+        description: Transaction date.  Field is provided to allow rating and taxing
+          to occur on a date other than the billing date.
+        type: string
+      Charge:
+        format: double
+        description: Charge amount to customer for transaction
+        type: number
+      Incorporated:
+        description: True if this transaction is within an incorporated area of the
+          local jurisdiction, otherwise False.
+        type: boolean
+      FederalExempt:
+        description: True if transaction is exempt from Federal Tax, otherwise false.
+        type: boolean
+      StateExempt:
+        description: True if transaction is exempt from State Tax, otherwise false.
+        type: boolean
+      CountyExempt:
+        description: True if transaction is exempt from County Tax, otherwise false.
+        type: boolean
+      LocalExempt:
+        description: True if transaction is exempt from Local Tax, otherwise false.
+        type: boolean
+      FederalPCode:
+        format: int32
+        description: Jurisdiction for Federal exemption.
+        type: integer
+      StatePCode:
+        format: int32
+        description: Jurisdiction for state exemption.
+        type: integer
+      CountyPCode:
+        format: int32
+        description: Jurisdiction for county exemption.
+        type: integer
+      LocalPCode:
+        format: int32
+        description: Jurisdiction for local exemption.
+        type: integer
+      Exemptions:
+        description: List of tax exemptions.
+        type: array
+        items:
+          "$ref": "#/definitions/TaxExemption"
+      ExemptionType:
+        format: int32
+        description: Exemtion type. See the "TM_00116_AFC SaaS pro Telecom Developer
+          Manual.pdf" for a list of valid exemption types.
+        type: integer
+      InvoiceNumber:
+        format: int32
+        description: User-defined invoice number.
+        type: integer
+      Optional:
+        format: int32
+        description: Optional user-defined value.
+        type: integer
+      CustomerNumber:
+        description: User-defined customer number.
+        type: string
+      CompanyIdentifier:
+        description: "Company identifier. Use the 3-character company identifier provided
+          by Avalara to your organization in order to include this
+          transaction in the monthly compliance reports. Otherwise, leave empty."
+        type: string
+      OptionalAlpha1:
+        description: Optional user-defined string value. 20-characters max.
+        type: string
+      Optional4:
+        format: int32
+        description: Optional user-defined value.
+        type: integer
+      Optional5:
+        format: int32
+        description: Optional user-defined value.
+        type: integer
+      Optional6:
+        format: int32
+        description: Optional user-defined value.
+        type: integer
+      Optional7:
+        format: int32
+        description: Optional user-defined value.
+        type: integer
+      Optional8:
+        format: int32
+        description: Optional user-defined value.
+        type: integer
+      Optional9:
+        format: int32
+        description: Optional user-defined value.
+        type: integer
+      Optional10:
+        format: int32
+        description: Optional user-defined value.
+        type: integer
+      AdjustmentMethod:
+        format: int32
+        description: Adjustment method. See the "TM_00116_AFC SaaS pro Telecom Developer
+          Manual.pdf" for a list of valid adjustment methods.
+        type: integer
+      Lines:
+        format: int32
+        description: Number of lines sold to customer when applicable.
+        type: integer
+      Locations:
+        format: int32
+        description: Number of customer locations.
+        type: integer
+      Minutes:
+        format: double
+        description: Number of minutes for call when appropriate.
+        type: double float
+      Debit:
+        description: Determines if this is a prepaid debit card transaction.
+        type: boolean
+      AdjustmentDiscount:
+        format: int32
+        description: Adjustment discount type. See the "TM_00116_AFC SaaS pro Telecom
+          Developer Manual.pdf" for a list of valid discount types.
+        type: integer
+      FacilitiesBased:
+        description: Specifies if the carrier delivering the service has company owned
+          facilities to provide the service.
+        type: boolean
+      Franchise:
+        description: Indicates if the company provides services sold pursuant to a
+          franchise agreement between the carrier and jurisdiction.
+        type: boolean
+      Lifeline:
+        description: Indicates if customer is a Lifeline participant.
+        type: boolean
+      Regulated:
+        description: True if regulated, otherwise false.
+        type: boolean
+      ServiceLevelNumber:
+        format: int32
+        description: User-defined service level number.
+        type: integer
+      Exclusions:
+        description: List of states for tax exclusions.
+        type: array
+        items:
+          "$ref": "#/definitions/Exclusion"
+      CategoryExemptions:
+        description: List of tax category exemptions.
+        type: array
+        items:
+          "$ref": "#/definitions/CategoryExemption"
+      OptionalFields:
+        description: User-defined list of optional alphanumeric fields.
+        type: array
+        items:
+          "$ref": "#/definitions/OptionalField"
+      TaxInclusive:
+        description: Indicates if the charge of this transaction is tax-inclusive
+          (reverse tax calculation).
+        type: boolean
+      SafeHarborOverrides:
+        description: List of overrides for the USF safe harbor rate.
+        type: array
+        items:
+          "$ref": "#/definitions/SafeHarborOverride"
+      DocumentCode:
+        description: Document code.
+        type: string
+      Commit:
+        description: Indicates if the transaction should be committed as soon at it
+          is processed.
+        type: boolean
+      ProRatedPct:
+        format: double
+        description: For pro-rated transactions, indicates the percentage to prorate
+		  specified as a decimal. Must not be included in request if transaction is 
+		  not pro-rated. Does not apply for tax-inclusive tax calculations.
+        type: number
+      IsAdjustment:
+        description: If set to true, indicates that this transaction must be processed as an adjustment.
+        type: boolean
+  MultiRequestInput:
+    description: Input parameter for multi-transaction tax calculation API.
+    type: object
+    properties:
+      DefaultValues:
+        "$ref": "#/definitions/MultiRequestItem"
+        description: Transaction containing default values to be populated on all 
+		  transactions included in the request. 
+      Transactions:
+        description: List of transactions to be processed.
+        type: array
+        items:
+          "$ref": "#/definitions/MultiRequestItem"
+  MultiRequestResult:
+    description: Tax calculation results for a single transaction within a multi-transaction request.
+    type: object
+    properties:	
+	  BaseSaleAmount:
+        format: double
+        description: For tax-inclusive tax calculations. Base sale amount necessary to arrive at desired total tax.
+      ErrorMessage:
+        description: Error message if transaction failed to be processed.
+        type: string
+      Taxes:
+        description: Taxes generated for transaction.
+        type: array
+        items:
+          "$ref": "#/definitions/TaxData"
 securityDefinitions:
   basic_auth:
     type: basic
